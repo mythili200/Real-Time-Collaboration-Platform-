@@ -1,5 +1,5 @@
 import cloudinary from "../config/cloudinary.js";
-import File from "../models/File.js";
+import { fileModel } from "../models/fileModel.js";
 
 export const uploadFile = async (req, res) => {
   try {
@@ -12,7 +12,7 @@ export const uploadFile = async (req, res) => {
       async (error, result) => {
         if (error) return res.status(500).json({ error });
 
-        const file = await File.create({
+        const file = await fileModel.create({
           user: req.user._id,
           fileUrl: result.secure_url,
           publicId: result.public_id,

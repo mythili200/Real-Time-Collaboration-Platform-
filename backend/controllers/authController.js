@@ -1,9 +1,9 @@
-import { userModel } from "../models/userModel";
+import { userModel } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import {
   generateAccessToken,
   generateRefreshToken,
-} from "../services/tokenServices";
+} from "../services/tokenServices.js";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
