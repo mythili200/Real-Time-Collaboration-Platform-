@@ -53,7 +53,7 @@ export const login = async (req, res) => {
 };
 
 export const refresh = (req, res) => {
-  const token = req.cookie.refreshToken;
+  const token = req.cookies.refreshToken;
   if (!token) {
     return res.status(401).json({ message: "No Token" });
   }

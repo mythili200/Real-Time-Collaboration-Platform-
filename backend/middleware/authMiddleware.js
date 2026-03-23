@@ -14,13 +14,11 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({ msg: "Unauthorized" });
     }
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    req.user = await userModel
-      .findById({ id: decoded._id })
-      .select("-password");
+    req.user = await userModel.findById(decoded.id).select("-password");
 
     next();
   } catch (err) {
-    res.status(500).json({ msg: err.msg });
+    res.status(500).json({ msg: err.message });
   }
 };
 
