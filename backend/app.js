@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import uploadRoute from "./routes/uploadRoutes.js";
 import testRoute from "./routes/testRoutes.js";
+import messageRoute from "./routes/messageRoutes.js";
 
 const app = express();
 app.use(express.json());
@@ -17,4 +18,5 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/test", testRoute);
 app.use("/api/files", uploadRoute);
+app.use("/api/messages", messageRoute);
 export default app;
