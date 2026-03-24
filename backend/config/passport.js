@@ -19,7 +19,7 @@ passport.use(
           user = await userModel.create({
             name: profile.displayName,
             email: profile.emails[0].value,
-            password: "google_oauth", // dummy
+            password: "google_oauth",
           });
         }
 
