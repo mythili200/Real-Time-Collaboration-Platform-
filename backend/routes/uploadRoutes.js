@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 router.post("/upload", protect, upload.single("file"), uploadFile);
-router.get("/", protect, getFiles);
+router.get("/all", protect, getFiles);
 router.get("/:id", protect, downloadFile);
 router.delete("/:id", protect, deleteFile);
 

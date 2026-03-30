@@ -4,56 +4,73 @@ import { Server } from "socket.io";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import { messageModel } from "./models/messageModel.js";
-
+import jwt from "jsonwebtoken";
+import cookie from "cookie";
 dotenv.config();
 connectDB();
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  // attach socket.io to the http server
   cors: {
-    origin: "*",
+    origin: "http://localhost:5173",
+    credentials: true,
   },
 });
-
-io.use((socket, next) => {
-  const token = socket.handshake.auth.token;
-
-  if (!token) return next(new Error("Unauthorized"));
-
+io.use(async (socket, next) => {
   try {
+    const cookies = socket.handshake.headers.cookie;
+    if (!cookies) return next(new Error("Unauthorized"));
+
+    const { token } = cookie.parse(cookies);
+    if (!token) return next(new Error("Unauthorized"));
+
     const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    socket.user = decoded;
+    socket.user = decoded; // attach user
     next();
   } catch (err) {
-    next(new Error("Invalid Token"));
+    next(new Error("Unauthorized"));
   }
 });
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
-  // ✅ Join Room + Load old messages
+  // Join room + load old messages
   socket.on("joinRoom", async (roomId) => {
     socket.join(roomId);
+    console.log(`User ${socket.id} joined room ${roomId}`);
 
     const messages = await messageModel
       .find({ roomId })
       .sort({ createdAt: 1 })
       .limit(50);
 
-    socket.emit("loadMessages", messages); // send old messages only to this user
+    socket.emit("loadMessages", messages);
   });
 
-  //Send Message (SAVE + BROADCAST)
+  // Save message to DB and emit to room
   socket.on("sendMessage", async ({ roomId, message }) => {
-    const newMessage = await messageModel.create({
-      roomId,
-      message,
-      user: socket.user._id,
-    });
+    try {
+      console.log("Saving message:", message, "from user:", socket.user._id);
 
-    io.to(roomId).emit("receiveMessage", newMessage);
+      const newMessage = await messageModel.create({
+        roomId,
+        message,
+        user: socket.user._id,
+      });
+
+      io.to(roomId).emit("receiveMessage", newMessage);
+    } catch (err) {
+      console.error("Error saving message:", err);
+    }
+  });
+  socket.on("typing", (roomId) => {
+    socket.to(roomId).emit("userTyping", socket.user._id);
+  });
+
+  socket.on("stopTyping", (roomId) => {
+    socket.to(roomId).emit("userStopTyping", socket.user._id);
   });
 
   socket.on("disconnect", () => {
@@ -61,7 +78,6 @@ io.on("connection", (socket) => {
   });
 });
 
-
 server.listen(process.env.PORT, () => {
-  console.log(`server is running on ${process.env.PORT} `);
+  console.log(`Server running on port ${process.env.PORT}`);
 });

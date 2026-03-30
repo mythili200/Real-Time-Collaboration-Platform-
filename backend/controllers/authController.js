@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken";
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    if (!name && !email && password) {
+    if (!name && !email && !password) {
       return res.status(400).json({ msg: "All the fields are required" });
     }
     const existingUser = await userModel.findOne({ email });
@@ -31,22 +31,41 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email) {
-      return res.status(404).json({ msg: "User Not Found" });
+
+    if (!email || !password) {
+      return res.status(400).json({ msg: "All fields required" });
     }
+
     const user = await userModel.findOne({ email });
-    const matched = bcrypt.compare(password, user.password);
-    if (!matched) {
-      return res.status(500).json({ msg: "Invalid Creentials" });
+
+    if (!user) {
+      return res.status(401).json({ msg: "User not found" });
     }
+
+    const matched = await bcrypt.compare(password, user.password);
+
+    if (!matched) {
+      return res.status(401).json({ msg: "Invalid Credentials" });
+    }
+
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
+
+    // ✅ Access token cookie (IMPORTANT)
+    res.cookie("token", accessToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false, // true in production (HTTPS)
+    });
+
+    // ✅ Refresh token cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: "lax",
       secure: false,
     });
-    res.json({ accessToken });
+
+    res.json({ msg: "Login successful" });
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }

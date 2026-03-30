@@ -13,7 +13,12 @@ import rateLimit from "express-rate-limit";
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:5173"],
+    credentials: true,
+  }),
+);
 app.use(helmet());
 app.use(morgan("dev")); // method,url,status and response time in dev format
 app.use(cookieParser());

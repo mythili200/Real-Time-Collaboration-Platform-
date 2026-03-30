@@ -1,6 +1,7 @@
 import express from "express";
 import { login, register, refresh } from "../controllers/authController.js";
 import passport from "passport";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -23,5 +24,9 @@ router.get(
     res.json({ token, user: req.user });
   },
 );
+
+router.get("/me", protect, (req, res) => {
+  res.json(req.user);
+});
 
 export default router;
