@@ -2,7 +2,7 @@
 
 A real-time collaborative chat application built with React, Socket.io, Node.js, Express, and MongoDB. Features include live messaging, typing indicators, and chat history persistence.
 --------------------------------------------------------
-Features
+Features ==>
 Real-time messaging with Socket.io
 Typing indicator similar to WhatsApp
 Messages are stored in MongoDB
@@ -13,20 +13,20 @@ Responsive and visually appealing UI with MUI
 Temporary message display for instant feedback before server confirmation
 
 -------------------------------------------------------------
-Tech Stack
+Tech Stack ==>
 Frontend: React, Material-UI, Framer Motion, Axios, Socket.io-client
 Backend: Node.js, Express, Socket.io, Mongoose (MongoDB), JWT authentication
 Database: MongoDB
 
 ---------------------------------------------------------------
-Usage
+Usage ==>
 Open the app in two browser tabs
 Login with any registered user
 Send messages and watch them appear in real-time
 When a user types, "User is typing..." appears in other tabs
 
 ---------------------------------------------------------------
-Future Improvements
+Future Improvements ==>
 Display usernames in the typing indicator
 Support multiple chat rooms
 Add message reactions
